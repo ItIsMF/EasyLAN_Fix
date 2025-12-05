@@ -8,17 +8,14 @@ import org.xiaoxian.util.ButtonUtil;
 import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.xiaoxian.EasyLAN.*;
 
 public class GuiEasyLanMain extends GuiScreen {
     private GuiTextField MotdTextBox;
-    private String MotdText = motd;
-
+    private String MotdText = motd != null ? motd : "";  // 添加 null 检查
     private final GuiScreen parentScreen;
     private final List<GuiButton> buttonList = new ArrayList<>();
 
@@ -29,210 +26,230 @@ public class GuiEasyLanMain extends GuiScreen {
     @Override
     public void initGui() {
         buttonList.clear();
-        // 设置
+
+        // 设置按钮
         buttonList.add(new ButtonUtil(0, this.width / 2 + 70, this.height - 25, 100, 20, I18n.format("easylan.back")));
-        buttonList.add(new ButtonUtil(1, this.width / 2 - 50, this.height - 25, 100, 20, I18n.format("easylan.load")));
-        buttonList.add(new ButtonUtil(2, this.width / 2 - 170, this.height - 25, 100, 20, I18n.format("easylan.save")));
+        buttonList.add(new ButtonUtil(1, this.width / 2 - 50, this.height - 25, 100, 20, I18n.format("easylan.save")));
 
-        // 基础设置
-        buttonList.add(new CheckBoxButtonUtil(10, this.width / 2 - 95, 55, allowPVP, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(11, this.width / 2 - 95, 80, onlineMode, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(12, this.width / 2 - 95, 105, spawnAnimals, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(13, this.width / 2 - 95, 130, spawnNPCs, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(14, this.width / 2 - 95, 155, allowFlight, 20, 20));
+        // 游戏规则设置
+        buttonList.add(new CheckBoxButtonUtil(10, this.width / 2 - 145, 60, allowPVP, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(11, this.width / 2 - 145, 85, onlineMode, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(12, this.width / 2 - 145, 110, spawnAnimals, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(13, this.width / 2 - 145, 135, spawnNPCs, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(14, this.width / 2 - 145, 160, allowFlight, 20, 20));
 
-        // 命令支持
-        buttonList.add(new CheckBoxButtonUtil(20, this.width / 2 + 25, 55, whiteList, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(21, this.width / 2 + 25, 80, BanCommand, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(22, this.width / 2 + 25, 105, OpCommand, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(23, this.width / 2 + 25, 130, SaveCommand, 20, 20));
+        // 指令支持
+        buttonList.add(new CheckBoxButtonUtil(20, this.width / 2 - 25, 60, whiteList, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(21, this.width / 2 - 25, 85, BanCommand, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(22, this.width / 2 - 25, 110, OpCommand, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(23, this.width / 2 - 25, 135, SaveCommand, 20, 20));
 
         // 其他设置
-        buttonList.add(new CheckBoxButtonUtil(30, this.width / 2 + 145, 55, HttpAPI, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(31, this.width / 2 + 145, 80, LanOutput, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(30, this.width / 2 + 95, 60, HttpAPI, 20, 20));
+        buttonList.add(new CheckBoxButtonUtil(31, this.width / 2 + 95, 85, LanOutput, 20, 20));
 
-        // Motd
-        MotdTextBox = new TextBoxUtil(100, mc.fontRenderer, this.width / 2 - 70, 185, 230, 20);
-        MotdTextBox.setMaxStringLength(100);
-        MotdTextBox.setText(MotdText);
+        // MOTD 文本框 - 添加安全初始化
+        try {
+            MotdTextBox = new TextBoxUtil(100, mc.fontRenderer, this.width / 2 - 70, 185, 230, 20);
+            if (MotdTextBox != null) {
+                MotdTextBox.setMaxStringLength(100);
+                safeSetMotdText();  // 使用安全方法设置文本
+            }
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error creating MOTD text box: " + e.getMessage());
+        }
+
+        updateGuiConfig();
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
-        // 标题
-        drawCenteredString(mc.fontRenderer, I18n.format("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
+        try {
+            this.drawDefaultBackground();
 
-        // 基础设置
-        drawString(mc.fontRenderer, I18n.format("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
+            // 安全绘制 MOTD 文本框
+            if (MotdTextBox != null) {
+                try {
+                    MotdTextBox.drawTextBox();
+                } catch (Exception e) {
+                    System.err.println("[EasyLAN] Error drawing MOTD text box: " + e.getMessage());
+                }
+            }
 
-        // 指令支持
-        drawString(mc.fontRenderer, I18n.format("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
+            // 绘制标签文本 - 添加 null 保护
+            safeDrawStrings();
 
-        // 其他设置
-        drawString(mc.fontRenderer, I18n.format("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
-        drawString(mc.fontRenderer, I18n.format("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
+            super.drawScreen(mouseX, mouseY, partialTicks);
 
-        // MOTD
-        drawString(mc.fontRenderer, I18n.format("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
-        MotdTextBox.drawTextBox();
-
-        for (GuiButton button : buttonList) {
-            button.drawButton(mc, mouseX, mouseY);
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Critical error in drawScreen: " + e.getMessage());
+            // 降级处理：至少绘制基本界面
+            drawCenteredString(fontRendererObj, "GUI Error - Please restart", width/2, height/2, 0xFF0000);
         }
+    }
 
-        super.drawScreen(mouseX, mouseY, partialTicks);
+    // 安全绘制字符串的方法
+    private void safeDrawStrings() {
+        try {
+            drawString(mc.fontRenderer, safeGetString("easylan.title"), this.width / 2, 10, 0xFFFFFF);
+
+            // 游戏规则
+            drawString(mc.fontRenderer, safeGetString("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
+
+            // 指令支持
+            drawString(mc.fontRenderer, safeGetString("easylan.text.setting2"), this.width / 2 - 25, 35, 0x33CCFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.whitelist"), this.width / 2 - 25, 60, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.ban"), this.width / 2 - 25, 85, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.op"), this.width / 2 - 25, 110, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.save"), this.width / 2 - 25, 135, 0xFFFFFF);
+
+            // 其他设置
+            drawString(mc.fontRenderer, safeGetString("easylan.text.setting3"), this.width / 2 + 95, 35, 0x33CCFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.httpApi"), this.width / 2 + 95, 60, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.lanInfo"), this.width / 2 + 95, 85, 0xFFFFFF);
+
+            // MOTD
+            drawString(mc.fontRenderer, safeGetString("easylan.text.motd"), this.width / 2 - 70, 170, 0xFFFFFF);
+
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error drawing strings: " + e.getMessage());
+        }
+    }
+
+    // 安全获取字符串的方法
+    private String safeGetString(String key) {
+        try {
+            String result = I18n.format(key);
+            return result != null ? result : key;
+        } catch (Exception e) {
+            return key;
+        }
+    }
+
+    // 安全设置 MOTD 文本的方法
+    private void safeSetMotdText() {
+        try {
+            if (MotdTextBox != null) {
+                MotdTextBox.setText(MotdText != null ? MotdText : "");
+            }
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error setting MOTD text: " + e.getMessage());
+        }
     }
 
     @Override
     protected void actionPerformed(GuiButton button) {
-        if (button.id == 0) {
-            mc.displayGuiScreen(parentScreen);
-        } else if (button.id == 1) {
-            ConfigUtil.load();
-            MotdText = motd;
-            updateGuiConfig();
-        } else if (button.id == 2) {
-            for (GuiButton CheckButton : buttonList) {
-                if (CheckButton instanceof CheckBoxButtonUtil) {
-                    CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) CheckButton;
-                    switch (checkBox.id) {
-                        case 10:
-                            allowPVP = checkBox.isChecked();
-                            ConfigUtil.set("pvp", String.valueOf(allowPVP));
-                            break;
-                        case 11:
-                            onlineMode = checkBox.isChecked();
-                            ConfigUtil.set("online-mode", String.valueOf(onlineMode));
-                            break;
-                        case 12:
-                            spawnAnimals = checkBox.isChecked();
-                            ConfigUtil.set("spawn-Animals", String.valueOf(spawnAnimals));
-                            break;
-                        case 13:
-                            spawnNPCs = checkBox.isChecked();
-                            ConfigUtil.set("spawn-NPCs", String.valueOf(spawnNPCs));
-                            break;
-                        case 14:
-                            allowFlight = checkBox.isChecked();
-                            ConfigUtil.set("allow-Flight", String.valueOf(allowFlight));
-                            break;
-                        case 20:
-                            whiteList = checkBox.isChecked();
-                            ConfigUtil.set("whiteList", String.valueOf(whiteList));
-                            break;
-                        case 21:
-                            BanCommand = checkBox.isChecked();
-                            ConfigUtil.set("BanCommand", String.valueOf(BanCommand));
-                            break;
-                        case 22:
-                            OpCommand = checkBox.isChecked();
-                            ConfigUtil.set("OpCommand", String.valueOf(OpCommand));
-                            break;
-                        case 23:
-                            SaveCommand = checkBox.isChecked();
-                            ConfigUtil.set("SaveCommand", String.valueOf(SaveCommand));
-                            break;
-                        case 30:
-                            HttpAPI = checkBox.isChecked();
-                            ConfigUtil.set("Http-Api", String.valueOf(HttpAPI));
-                            break;
-                        case 31:
-                            LanOutput = checkBox.isChecked();
-                            ConfigUtil.set("Lan-output", String.valueOf(LanOutput));
-                            break;
-                        default:
-                            break;
-                    }
+        try {
+            if (button instanceof ButtonUtil) {
+                switch (button.id) {
+                    case 0: // 返回
+                        mc.displayGuiScreen(parentScreen);
+                        break;
+                    case 1: // 保存
+                        saveConfig();
+                        break;
+                }
+            } else if (button instanceof CheckBoxButtonUtil) {
+                CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
+                switch (button.id) {
+                    case 10: allowPVP = checkBox.isChecked(); break;
+                    case 11: onlineMode = checkBox.isChecked(); break;
+                    case 12: spawnAnimals = checkBox.isChecked(); break;
+                    case 13: spawnNPCs = checkBox.isChecked(); break;
+                    case 14: allowFlight = checkBox.isChecked(); break;
+                    case 20: whiteList = checkBox.isChecked(); break;
+                    case 21: BanCommand = checkBox.isChecked(); break;
+                    case 22: OpCommand = checkBox.isChecked(); break;
+                    case 23: SaveCommand = checkBox.isChecked(); break;
+                    case 30: HttpAPI = checkBox.isChecked(); break;
+                    case 31: LanOutput = checkBox.isChecked(); break;
                 }
             }
-            motd = MotdTextBox.getText();
-            ConfigUtil.set("Motd", motd);
-            ConfigUtil.save();
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error in actionPerformed: " + e.getMessage());
         }
-
-        if (button instanceof CheckBoxButtonUtil) {
-            CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
-            checkBox.toggleChecked();
-        }
-        super.actionPerformed(button);
     }
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
-        MotdTextBox.textboxKeyTyped(typedChar, keyCode);
-        MotdText = MotdTextBox.getText();
-        super.keyTyped(typedChar, keyCode);
+        try {
+            if (MotdTextBox != null) {
+                MotdTextBox.textboxKeyTyped(typedChar, keyCode);
+                MotdText = MotdTextBox.getText();
+            }
+            super.keyTyped(typedChar, keyCode);
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error in keyTyped: " + e.getMessage());
+        }
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-        MotdText = MotdTextBox.getText();
-        for (GuiButton button : buttonList) {
-            if (button.mousePressed(mc, mouseX, mouseY)) {
-                actionPerformed(button);
+        try {
+            if (MotdTextBox != null) {
+                MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
+                MotdText = MotdTextBox.getText();
             }
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error in mouseClicked: " + e.getMessage());
         }
-        super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     private void updateGuiConfig() {
-        // 更新文本框状态
-        MotdTextBox.setText(MotdText);
+        try {
+            safeSetMotdText();
 
-        // 更新复选框状态
-        for (GuiButton checkButton : buttonList) {
-            if (checkButton instanceof CheckBoxButtonUtil) {
-                CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) checkButton;
-                switch (checkBox.id) {
-                    case 10:
-                        checkBox.setChecked(allowPVP);
-                        break;
-                    case 11:
-                        checkBox.setChecked(onlineMode);
-                        break;
-                    case 12:
-                        checkBox.setChecked(spawnAnimals);
-                        break;
-                    case 13:
-                        checkBox.setChecked(spawnNPCs);
-                        break;
-                    case 14:
-                        checkBox.setChecked(allowFlight);
-                        break;
-                    case 20:
-                        checkBox.setChecked(whiteList);
-                        break;
-                    case 21:
-                        checkBox.setChecked(BanCommand);
-                        break;
-                    case 22:
-                        checkBox.setChecked(OpCommand);
-                        break;
-                    case 23:
-                        checkBox.setChecked(SaveCommand);
-                        break;
-                    case 30:
-                        checkBox.setChecked(HttpAPI);
-                        break;
-                    case 31:
-                        checkBox.setChecked(LanOutput);
-                        break;
-                    default:
-                        break;
+            for (GuiButton button : buttonList) {
+                if (button instanceof CheckBoxButtonUtil) {
+                    CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
+                    switch (button.id) {
+                        case 10: checkBox.setChecked(allowPVP); break;
+                        case 11: checkBox.setChecked(onlineMode); break;
+                        case 12: checkBox.setChecked(spawnAnimals); break;
+                        case 13: checkBox.setChecked(spawnNPCs); break;
+                        case 14: checkBox.setChecked(allowFlight); break;
+                        case 20: checkBox.setChecked(whiteList); break;
+                        case 21: checkBox.setChecked(BanCommand); break;
+                        case 22: checkBox.setChecked(OpCommand); break;
+                        case 23: checkBox.setChecked(SaveCommand); break;
+                        case 30: checkBox.setChecked(HttpAPI); break;
+                        case 31: checkBox.setChecked(LanOutput); break;
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error updating GUI config: " + e.getMessage());
+        }
+    }
+
+    private void saveConfig() {
+        try {
+            // 保存 MOTD
+            motd = MotdText != null ? MotdText : "";
+            ConfigUtil.set("motd", motd);
+
+            // 保存其他设置
+            ConfigUtil.set("allowPVP", String.valueOf(allowPVP));
+            ConfigUtil.set("onlineMode", String.valueOf(onlineMode));
+            ConfigUtil.set("spawnAnimals", String.valueOf(spawnAnimals));
+            ConfigUtil.set("spawnNPCs", String.valueOf(spawnNPCs));
+            ConfigUtil.set("allowFlight", String.valueOf(allowFlight));
+            ConfigUtil.set("whiteList", String.valueOf(whiteList));
+            ConfigUtil.set("BanCommand", String.valueOf(BanCommand));
+            ConfigUtil.set("OpCommand", String.valueOf(OpCommand));
+            ConfigUtil.set("SaveCommand", String.valueOf(SaveCommand));
+            ConfigUtil.set("HttpAPI", String.valueOf(HttpAPI));
+            ConfigUtil.set("LanOutput", String.valueOf(LanOutput));
+
+            ConfigUtil.save();
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error saving config: " + e.getMessage());
         }
     }
 }
