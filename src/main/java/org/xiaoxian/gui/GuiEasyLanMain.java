@@ -156,6 +156,10 @@ public class GuiEasyLanMain extends GuiScreen {
                 }
             } else if (button instanceof CheckBoxButtonUtil) {
                 CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
+
+                // 🔧 关键：切换状态并更新变量
+                checkBox.toggle(); // 这现在可以正常工作了！
+
                 switch (button.id) {
                     case 10: allowPVP = checkBox.isChecked(); break;
                     case 11: onlineMode = checkBox.isChecked(); break;
@@ -169,9 +173,12 @@ public class GuiEasyLanMain extends GuiScreen {
                     case 30: HttpAPI = checkBox.isChecked(); break;
                     case 31: LanOutput = checkBox.isChecked(); break;
                 }
+
+                System.out.println("[EasyLAN] Checkbox " + button.id + " toggled to: " + checkBox.isChecked());
             }
         } catch (Exception e) {
             System.err.println("[EasyLAN] Error in actionPerformed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -220,11 +227,13 @@ public class GuiEasyLanMain extends GuiScreen {
                         case 23: checkBox.setChecked(SaveCommand); break;
                         case 30: checkBox.setChecked(HttpAPI); break;
                         case 31: checkBox.setChecked(LanOutput); break;
+                        default: break;
                     }
                 }
             }
         } catch (Exception e) {
             System.err.println("[EasyLAN] Error updating GUI config: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
