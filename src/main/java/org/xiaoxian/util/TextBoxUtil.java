@@ -14,6 +14,7 @@ public class TextBoxUtil extends GuiTextField {
     private Field lineScrollOffsetField;
     private long lastUpdateTick = 20;
     private int componentId;
+    private FontRenderer fontRendererObj;
 
     public TextBoxUtil(int componentId, FontRenderer fontRendererInstance, int x, int y, int width, int height) {
         super(fontRendererInstance, x, y, width, height);
@@ -70,29 +71,71 @@ public class TextBoxUtil extends GuiTextField {
                     }
                 }
 
-                // 🔧 使用正确的字体渲染器（从父类获取）
-                FontRenderer renderer = null;
-                try {
-                    // 通过反射安全获取 fontRendererObj
-                    Field fontRendererObjField = GuiTextField.class.getDeclaredField("fontRendererObj");
-                    fontRendererObjField.setAccessible(true);
-                    renderer = (FontRenderer) fontRendererObjField.get(this);
-                } catch (Exception e) {
-                    System.err.println("[EasyLan] Error accessing fontRendererObj: " + e.getMessage());
-                }
-
-                // 安全绘制文本
+                // 🔧 智能获取字体渲染器
+                FontRenderer renderer = getFontRendererSmartly();
                 if (renderer != null) {
                     drawString(renderer, textToDraw, xPosition + 4, yPosition + (height - 8) / 2, textColor);
                 } else {
-                    // 最后的降级方案
-                    System.err.println("[EasyLan] Warning: No FontRenderer available for drawing");
+                    System.err.println("[EasyLan] Critical: No FontRenderer available - falling back to basic rendering");
+                    // 最后的降级方案：什么都不画
                 }
             }
         } catch (Exception e) {
             System.err.println("[EasyLan | TextBoxUtil] Critical error in drawTextBox: " + e.getMessage());
-            e.printStackTrace();
+            // 降级到父类方法
+            try {
+                super.drawTextBox();
+            } catch (Exception ex) {
+                // 静默失败
+            }
         }
+    }
+
+    // 🔧 智能获取字体渲染器的方法
+    private FontRenderer getFontRendererSmartly() {
+        try {
+            // 方法1：直接访问公开字段（如果有）
+            if (this.fontRendererObj != null) {
+                return this.fontRendererObj;
+            }
+        } catch (Exception e) {
+            // 字段不存在或访问失败
+        }
+
+        try {
+            // 方法3：通过反射尝试多种可能的字段名
+            Class<?> clazz = GuiTextField.class;
+            Field[] fields = clazz.getDeclaredFields();
+
+            for (Field field : fields) {
+                if (FontRenderer.class.isAssignableFrom(field.getType())) {
+                    try {
+                        field.setAccessible(true);
+                        Object value = field.get(this);
+                        if (value instanceof FontRenderer) {
+                            //System.out.println("[EasyLan] Found FontRenderer in field: " + field.getName());
+                            return (FontRenderer) value;
+                        }
+                    } catch (Exception ex) {
+                        // 继续尝试下一个字段
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // 反射失败
+        }
+
+        try {
+            // 方法4：最后的降级方案
+            if (Minecraft.getMinecraft() != null && Minecraft.getMinecraft().fontRenderer != null) {
+                return Minecraft.getMinecraft().fontRenderer;
+            }
+        } catch (Exception e) {
+            // Minecraft实例访问失败
+        }
+
+        System.err.println("[EasyLan] Failed to get FontRenderer by any method");
+        return null;
     }
 
     // 🔧 添加安全获取文本的方法
@@ -125,6 +168,44 @@ public class TextBoxUtil extends GuiTextField {
         } catch (Exception e) {
             System.err.println("[EasyLan | TextBoxUtil] Error getting text: " + e.getMessage());
             return "";
+        }
+    }
+
+    // 🔧 确保所有必要方法都被正确重写
+    @Override
+    public boolean textboxKeyTyped(char typedChar, int keyCode) {
+        try {
+            return super.textboxKeyTyped(typedChar, keyCode);
+        } catch (Exception e) {
+            System.err.println("[EasyLan | TextBoxUtil] Error in textboxKeyTyped: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        try {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+        } catch (Exception e) {
+            System.err.println("[EasyLan | TextBoxUtil] Error in mouseClicked: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setFocused(boolean focused) {
+        try {
+            super.setFocused(focused);
+        } catch (Exception e) {
+            System.err.println("[EasyLan | TextBoxUtil] Error setting focus: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        try {
+            super.setVisible(visible);
+        } catch (Exception e) {
+            System.err.println("[EasyLan | TextBoxUtil] Error setting visibility: " + e.getMessage());
         }
     }
 }

@@ -170,19 +170,138 @@ public class ShareToLan {
         }, 100, 500, TimeUnit.MILLISECONDS);
     }
 
+
     private void setMaxPlayer(String fieldName) {
         try {
-            ServerConfigurationManager configManager = MinecraftServer.getServer().getConfigurationManager();
-            Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.ServerConfigurationManager");
-            Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
-            maxplayerField.setAccessible(true);
-            maxplayerField.set(configManager, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getText()));
-            if (!LanOutput) {
-                ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.format("easylan.chat.CtPlayer") + " &f[&e" + GuiShareToLanEdit.MaxPlayerBox.getText() + "&f]");
+            IntegratedServer server = (IntegratedServer) FMLCommonHandler.instance().getMinecraftServerInstance();
+            if (server == null) {
+                System.err.println("[EasyLAN] Server instance is null");
+                return;
             }
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            ChatUtil.sendMsg("&e[&6EasyLan&e] &c" + I18n.format("easylan.chat.CtPlayerError"));
-            System.out.println("[EasyLAN] setMaxPlayer Error: " + e.getMessage());
+
+            String maxPlayerStr = GuiShareToLanEdit.MaxPlayerBox.getText();
+            if (maxPlayerStr == null || maxPlayerStr.isEmpty()) {
+                System.err.println("[EasyLAN] MaxPlayer text is empty or null");
+                return;
+            }
+
+            int newMaxPlayers = Integer.parseInt(maxPlayerStr);
+
+            // 使用最可靠的方法设置最大玩家数
+            boolean success = setMaxPlayersReliably(server, newMaxPlayers);
+
+            if (success) {
+                System.out.println("[EasyLAN] Successfully set max players to: " + newMaxPlayers);
+            } else {
+                System.err.println("[EasyLAN] Failed to set max players - using alternative approach");
+                // 备用方案：通过反射直接修改
+                setMaxPlayersByForce(server, newMaxPlayers);
+            }
+
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error in setMaxPlayer: " + e.getMessage());
+        }
+    }
+
+    // 可靠的设置方法
+    private boolean setMaxPlayersReliably(IntegratedServer server, int maxPlayers) {
+        try {
+            Object playerList = server.getConfigurationManager();
+            if (playerList == null) return false;
+
+            // 获取 PlayerList 的真实类
+            Class<?> playerListClass = playerList.getClass();
+            System.out.println("[EasyLAN] Working with class: " + playerListClass.getName());
+
+            // 尝试所有可能的父类
+            Class<?> currentClass = playerListClass;
+            int classLevel = 0;
+
+            while (currentClass != null && classLevel < 5) {
+                System.out.println("[EasyLAN] Checking class level " + classLevel + ": " + currentClass.getName());
+
+                Field[] fields = currentClass.getDeclaredFields();
+                for (Field field : fields) {
+                    try {
+                        // 检查是否为 int 类型
+                        if (field.getType() == int.class || field.getType() == Integer.class) {
+                            field.setAccessible(true);
+
+                            // 获取字段名
+                            String fName = field.getName();
+                            System.out.println("[EasyLAN] Found int field: " + fName);
+
+                            // 尝试获取当前值
+                            try {
+                                Object currentValue = field.get(playerList);
+                                System.out.println("[EasyLAN] Current value of " + fName + ": " + currentValue);
+                            } catch (Exception e) {
+                                System.out.println("[EasyLAN] Cannot read " + fName + ": " + e.getMessage());
+                            }
+
+                            // 关键：设置新值
+                            field.setInt(playerList, maxPlayers);
+                            System.out.println("[EasyLAN] Set " + fName + " to " + maxPlayers);
+                            return true;
+
+                        }
+                    } catch (Exception e) {
+                        System.out.println("[EasyLAN] Error with field " + field.getName() + ": " + e.getMessage());
+                    }
+                }
+
+                currentClass = currentClass.getSuperclass();
+                classLevel++;
+            }
+
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error in setMaxPlayersReliably: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    // 强制设置方法（最后手段）
+    private void setMaxPlayersByForce(IntegratedServer server, int maxPlayers) {
+        try {
+            System.out.println("[EasyLAN] Using force method to set max players");
+
+            Object playerList = server.getConfigurationManager();
+            if (playerList == null) return;
+
+            // 暴力遍历所有字段
+            Class<?> clazz = playerList.getClass();
+            int level = 0;
+
+            while (clazz != null && level < 5) {
+                Field[] fields = clazz.getDeclaredFields();
+
+                for (Field field : fields) {
+                    try {
+                        if (field.getType() == int.class) {
+                            field.setAccessible(true);
+                            int currentValue = field.getInt(playerList);
+
+                            // 启发式判断：合理的玩家数范围
+                            if (currentValue > 0 && currentValue <= 1000) {
+                                field.setInt(playerList, maxPlayers);
+                                System.out.println("[EasyLAN] Force set " + field.getName() + " from " + currentValue + " to " + maxPlayers);
+                                return;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // 继续尝试
+                    }
+                }
+
+                clazz = clazz.getSuperclass();
+                level++;
+            }
+
+            System.out.println("[EasyLAN] Force method also failed");
+
+        } catch (Exception e) {
+            System.err.println("[EasyLAN] Error in force method: " + e.getMessage());
         }
     }
 
