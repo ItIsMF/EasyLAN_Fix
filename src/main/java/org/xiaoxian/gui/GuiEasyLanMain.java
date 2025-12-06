@@ -54,6 +54,10 @@ public class GuiEasyLanMain extends GuiScreen {
         MotdTextBox = new TextBoxUtil(100, mc.fontRenderer, this.width / 2 - 70 - 45, 195, 230, 20);
         MotdTextBox.setMaxStringLength(100);
 
+        if (motd != null) {
+            MotdTextBox.setText(motd);
+        }
+
         updateGuiConfig();
     }
 
@@ -183,11 +187,23 @@ public class GuiEasyLanMain extends GuiScreen {
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
         try {
-            if (MotdTextBox != null) {
+            // 关键修复：确保 MOTD 文本框能够接收键盘输入
+            if (MotdTextBox != null && MotdTextBox.isFocused()) {
                 MotdTextBox.textboxKeyTyped(typedChar, keyCode);
+                // 更新 MOTD 文本
                 MotdText = MotdTextBox.getText();
             }
-            super.keyTyped(typedChar, keyCode);
+
+            // 处理 ESC 键
+            if (keyCode == 1) { // ESC key
+                mc.displayGuiScreen(parentScreen);
+            }
+
+            // 处理回车键
+            if (keyCode == 28) { // Enter key
+                saveConfig();
+            }
+
         } catch (Exception e) {
             System.err.println("[EasyLAN] Error in keyTyped: " + e.getMessage());
         }
@@ -197,6 +213,11 @@ public class GuiEasyLanMain extends GuiScreen {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
+        if (MotdTextBox != null) {
+            MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
+            MotdText = MotdTextBox.getText();
+        }
+
         for (GuiButton button : buttonList) {
             if (button.mousePressed(mc, mouseX, mouseY)) {
                 actionPerformed(button);
@@ -205,9 +226,25 @@ public class GuiEasyLanMain extends GuiScreen {
         }
     }
 
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+
+        // 关键修复：确保文本框的文本与变量同步
+        if (MotdTextBox != null) {
+            String currentText = MotdTextBox.getText();
+            if (!currentText.equals(MotdText)) {
+                MotdText = currentText;
+            }
+        }
+    }
+
     private void updateGuiConfig() {
         try {
-            safeSetMotdText();
+            if (MotdTextBox != null) {
+                MotdTextBox.setText(motd != null ? motd : "");
+                MotdText = MotdTextBox.getText();
+            }
 
             for (GuiButton button : buttonList) {
                 if (button instanceof CheckBoxButtonUtil) {
@@ -234,22 +271,26 @@ public class GuiEasyLanMain extends GuiScreen {
 
     private void saveConfig() {
         try {
-            // 保存 MOTD
-            motd = MotdText != null ? MotdText : "";
-            ConfigUtil.set("motd", motd);
-
+            if (MotdTextBox != null) {
+                motd = MotdTextBox.getText();
+            } else {
+                motd = MotdText;
+            }
             // 保存其他设置
-            ConfigUtil.set("allowPVP", String.valueOf(allowPVP));
-            ConfigUtil.set("onlineMode", String.valueOf(onlineMode));
-            ConfigUtil.set("spawnAnimals", String.valueOf(spawnAnimals));
-            ConfigUtil.set("spawnNPCs", String.valueOf(spawnNPCs));
-            ConfigUtil.set("allowFlight", String.valueOf(allowFlight));
+            ConfigUtil.set("Motd", motd);
+            ConfigUtil.set("Http-Api", String.valueOf(HttpAPI));
+            ConfigUtil.set("Lan-output", String.valueOf(LanOutput));
+            ConfigUtil.set("pvp", String.valueOf(allowPVP));
+            ConfigUtil.set("online-mode", String.valueOf(onlineMode));
+            ConfigUtil.set("spawn-Animals", String.valueOf(spawnAnimals));
+            ConfigUtil.set("spawn-NPCs", String.valueOf(spawnNPCs));
+            ConfigUtil.set("allow-Flight", String.valueOf(allowFlight));
             ConfigUtil.set("whiteList", String.valueOf(whiteList));
             ConfigUtil.set("BanCommand", String.valueOf(BanCommand));
             ConfigUtil.set("OpCommand", String.valueOf(OpCommand));
             ConfigUtil.set("SaveCommand", String.valueOf(SaveCommand));
-            ConfigUtil.set("HttpAPI", String.valueOf(HttpAPI));
-            ConfigUtil.set("LanOutput", String.valueOf(LanOutput));
+            ConfigUtil.set("Port", CustomPort);
+            ConfigUtil.set("MaxPlayer", CustomMaxPlayer);
 
             ConfigUtil.save();
         } catch (Exception e) {
