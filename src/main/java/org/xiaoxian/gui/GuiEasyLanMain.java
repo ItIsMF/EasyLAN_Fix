@@ -4,13 +4,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
 import org.xiaoxian.util.ButtonUtil;
 import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.PositionedSoundRecord;
 import java.util.ArrayList;
 import java.util.List;
 import static org.xiaoxian.EasyLAN.*;
@@ -29,13 +26,11 @@ public class GuiEasyLanMain extends GuiScreen {
     public void initGui() {
         buttonList.clear();
 
-        // 设置按钮
-        buttonList.add(new ButtonUtil(0, this.width / 2 + 70, this.height - 25, 100, 20, I18n.format("easylan.back")));
-        buttonList.add(new ButtonUtil(1, this.width / 2 - 50, this.height - 25, 100, 20, I18n.format("easylan.save")));
+        buttonList.add(new ButtonUtil(0, this.width / 2 + 70 - 60, this.height - 25, 100, 20, I18n.format("easylan.back")));
+        buttonList.add(new ButtonUtil(1, this.width / 2 - 50 - 60, this.height - 25, 100, 20, I18n.format("easylan.save")));
 
-        // 游戏规则设置 - 使用绝对坐标，避免计算错误
-        int baseX = this.width / 2 - 145;
-        int baseY = 60;
+        int baseX = this.width / 2 - 145 + 45;
+        int baseY = 60 - 5;
         int spacing = 25;
 
         buttonList.add(new CheckBoxButtonUtil(10, baseX, baseY, allowPVP, 20, 20));
@@ -44,22 +39,19 @@ public class GuiEasyLanMain extends GuiScreen {
         buttonList.add(new CheckBoxButtonUtil(13, baseX, baseY + spacing * 3, spawnNPCs, 20, 20));
         buttonList.add(new CheckBoxButtonUtil(14, baseX, baseY + spacing * 4, allowFlight, 20, 20));
 
-        // 指令支持
-        baseX = this.width / 2 - 25;
-        baseY = 60;
+        baseX = this.width / 2 - 25 + 60;
+        baseY = 60 - 5;
         buttonList.add(new CheckBoxButtonUtil(20, baseX, baseY, whiteList, 20, 20));
         buttonList.add(new CheckBoxButtonUtil(21, baseX, baseY + spacing, BanCommand, 20, 20));
         buttonList.add(new CheckBoxButtonUtil(22, baseX, baseY + spacing * 2, OpCommand, 20, 20));
         buttonList.add(new CheckBoxButtonUtil(23, baseX, baseY + spacing * 3, SaveCommand, 20, 20));
 
-        // 其他设置
-        baseX = this.width / 2 + 95;
-        baseY = 60;
+        baseX = this.width / 2 + 95 + 70;
+        baseY = 60 - 5;
         buttonList.add(new CheckBoxButtonUtil(30, baseX, baseY, HttpAPI, 20, 20));
         buttonList.add(new CheckBoxButtonUtil(31, baseX, baseY + spacing, LanOutput, 20, 20));
 
-        // MOTD
-        MotdTextBox = new TextBoxUtil(100, mc.fontRenderer, this.width / 2 - 70, 185, 230, 20);
+        MotdTextBox = new TextBoxUtil(100, mc.fontRenderer, this.width / 2 - 70 - 45, 195, 230, 20);
         MotdTextBox.setMaxStringLength(100);
 
         updateGuiConfig();
@@ -90,7 +82,7 @@ public class GuiEasyLanMain extends GuiScreen {
             drawString(mc.fontRenderer, safeGetString("easylan.text.lanInfo"), this.width / 2 + 95, 85, 0xFFFFFF);
 
             // MOTD
-            drawString(mc.fontRenderer, safeGetString("easylan.text.motd"), this.width / 2 - 70, 170, 0xFFFFFF);
+            drawString(mc.fontRenderer, safeGetString("easylan.text.motd"), this.width / 2 - 70, 180, 0xFFFFFF);
 
         } catch (Exception e) {
             System.err.println("[EasyLAN] Error drawing label strings: " + e.getMessage());
@@ -164,9 +156,7 @@ public class GuiEasyLanMain extends GuiScreen {
             } else if (button instanceof CheckBoxButtonUtil) {
                 CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
 
-                // 只需要更新变量和配置，toggle() 已在 mousePressed 中调用
                 boolean newState = checkBox.isChecked();
-
                 switch (button.id) {
                     case 10: allowPVP = newState; break;
                     case 11: onlineMode = newState; break;
@@ -209,14 +199,6 @@ public class GuiEasyLanMain extends GuiScreen {
 
         for (GuiButton button : buttonList) {
             if (button.mousePressed(mc, mouseX, mouseY)) {
-                ISound sound = new PositionedSoundRecord(
-                    new ResourceLocation("random", "click"),  // 声音资源
-                    1.0F,  // 音量
-                    1.0F,  // 音调
-                    0.0F,  // x坐标
-                    0.0F,  // y坐标
-                    0.0F   // z坐标
-                );
                 actionPerformed(button);
                 return;
             }
