@@ -1,12 +1,14 @@
 package org.xiaoxian.util;
 
+import static org.xiaoxian.EasyLAN.*;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
-import static org.xiaoxian.EasyLAN.*;
 
 public class ConfigUtil {
+
     private static final String CONFIG_FILE = "config/easylan.cfg";
     private static final Properties properties = new Properties();
 
@@ -38,7 +40,8 @@ public class ConfigUtil {
         try {
             // 确保目录存在
             File configFile = new File(CONFIG_FILE);
-            configFile.getParentFile().mkdirs();
+            configFile.getParentFile()
+                .mkdirs();
 
             // 将全局变量的当前值保存到配置文件
             saveGlobalsToProperties();

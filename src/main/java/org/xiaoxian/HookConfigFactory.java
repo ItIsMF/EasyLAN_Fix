@@ -1,16 +1,18 @@
 package org.xiaoxian;
 
-import cpw.mods.fml.client.IModGuiFactory;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import org.xiaoxian.gui.GuiEasyLanMain;
-
 import java.util.Set;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+
+import org.xiaoxian.gui.GuiEasyLanMain;
+
+import cpw.mods.fml.client.IModGuiFactory;
+
 public class HookConfigFactory implements IModGuiFactory {
+
     @Override
-    public void initialize(Minecraft minecraftInstance) {
-    }
+    public void initialize(Minecraft minecraftInstance) {}
 
     @Override
     public Class<? extends GuiScreen> mainConfigGuiClass() {

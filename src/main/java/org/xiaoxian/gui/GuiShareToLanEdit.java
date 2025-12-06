@@ -1,24 +1,27 @@
 package org.xiaoxian.gui;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import org.lwjgl.input.Keyboard;
-import org.xiaoxian.util.ConfigUtil;
-import org.xiaoxian.util.TextBoxUtil;
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+
+import net.minecraft.client.gui.*;
+import net.minecraft.client.resources.I18n;
+import net.minecraftforge.client.event.GuiOpenEvent;
+
+import org.lwjgl.input.Keyboard;
+import org.xiaoxian.util.ConfigUtil;
+import org.xiaoxian.util.TextBoxUtil;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class GuiShareToLanEdit {
 
     // 使用 final 修饰确保不会被重新赋值为 null
     public static volatile String PortText = "";
     public static volatile String PortWarningText = "";
-    public static volatile String MaxPlayerText = "20";  // 给定默认值
+    public static volatile String MaxPlayerText = "20"; // 给定默认值
     public static volatile String MaxPlayerWarningText = "";
 
     // 使用 volatile 确保线程安全
@@ -58,7 +61,8 @@ public class GuiShareToLanEdit {
 
         // 安全字符串获取方法
         private String getSafeString(String value, String defaultValue) {
-            if (value == null || value.trim().isEmpty()) {
+            if (value == null || value.trim()
+                .isEmpty()) {
                 return defaultValue;
             }
             return value;
@@ -79,12 +83,12 @@ public class GuiShareToLanEdit {
                 // 创建端口文本框
                 PortTextBox = new TextBoxUtil(4, mc.fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20);
                 PortTextBox.setMaxStringLength(5);
-                safeSetText(PortTextBox, PortText);  // 使用安全方法
+                safeSetText(PortTextBox, PortText); // 使用安全方法
 
                 // 创建最大玩家数文本框
                 MaxPlayerBox = new TextBoxUtil(5, mc.fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20);
                 MaxPlayerBox.setMaxStringLength(6);
-                safeSetText(MaxPlayerBox, MaxPlayerText);  // 使用安全方法
+                safeSetText(MaxPlayerBox, MaxPlayerText); // 使用安全方法
 
                 // 更新按钮状态
                 updateButtonState();
@@ -102,8 +106,8 @@ public class GuiShareToLanEdit {
                     String portText = PortTextBox != null ? PortTextBox.getText() : "";
                     String maxPlayerText = MaxPlayerBox != null ? MaxPlayerBox.getText() : "20";
 
-                    button101.enabled = checkPortAndEnableButton(portText) &&
-                        checkMaxPlayerAndEnableButton(maxPlayerText);
+                    button101.enabled = checkPortAndEnableButton(portText)
+                        && checkMaxPlayerAndEnableButton(maxPlayerText);
                 }
             } catch (Exception e) {
                 System.err.println("[EasyLAN] Error updating button state: " + e.getMessage());
@@ -118,10 +122,30 @@ public class GuiShareToLanEdit {
                 if (PortTextBox != null) PortTextBox.drawTextBox();
                 if (MaxPlayerBox != null) MaxPlayerBox.drawTextBox();
 
-                drawString(mc.fontRenderer, I18n.format("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-                drawString(mc.fontRenderer, PortWarningText != null ? PortWarningText : "", this.width / 2 - 155, this.height - 45, 0xFF0000);
-                drawString(mc.fontRenderer, I18n.format("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-                drawString(mc.fontRenderer, MaxPlayerWarningText != null ? MaxPlayerWarningText : "", this.width / 2 + 5, this.height - 45, 0xFF0000);
+                drawString(
+                    mc.fontRenderer,
+                    I18n.format("easylan.text.port"),
+                    this.width / 2 - 155,
+                    this.height - 85,
+                    0xFFFFFF);
+                drawString(
+                    mc.fontRenderer,
+                    PortWarningText != null ? PortWarningText : "",
+                    this.width / 2 - 155,
+                    this.height - 45,
+                    0xFF0000);
+                drawString(
+                    mc.fontRenderer,
+                    I18n.format("easylan.text.maxplayer"),
+                    this.width / 2 + 5,
+                    this.height - 85,
+                    0xFFFFFF);
+                drawString(
+                    mc.fontRenderer,
+                    MaxPlayerWarningText != null ? MaxPlayerWarningText : "",
+                    this.width / 2 + 5,
+                    this.height - 45,
+                    0xFF0000);
             } catch (Exception e) {
                 System.err.println("[EasyLAN] Error in drawScreen: " + e.getMessage());
             }
@@ -155,7 +179,9 @@ public class GuiShareToLanEdit {
                 String previousText = PortTextBox != null ? PortTextBox.getText() : "";
                 String previousMaxPlayerText = MaxPlayerBox != null ? MaxPlayerBox.getText() : "20";
 
-                if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
+                if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK
+                    || keyCode == Keyboard.KEY_RETURN
+                    || keyCode == Keyboard.KEY_ESCAPE) {
                     if (Character.isDigit(typedChar)) {
                         try {
                             String newPortText = PortTextBox != null ? PortTextBox.getText() : "";

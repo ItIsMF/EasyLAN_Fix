@@ -1,8 +1,6 @@
 package org.xiaoxian.lan;
 
-import fi.iki.elonen.NanoHTTPD;
-import net.minecraft.entity.player.EntityPlayerMP;
-import com.google.gson.Gson;
+import static org.xiaoxian.lan.ShareToLan.playerList;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,7 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.xiaoxian.lan.ShareToLan.playerList;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+import com.google.gson.Gson;
+
+import fi.iki.elonen.NanoHTTPD;
 
 public class ApiLanStatus {
 

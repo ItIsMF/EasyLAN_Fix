@@ -1,12 +1,15 @@
 package org.xiaoxian.util;
 
+import static org.xiaoxian.EasyLAN.devMode;
+
+import java.awt.*;
+import java.lang.reflect.Field;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
+
 import org.lwjgl.opengl.GL11;
-import java.awt.*;
-import java.lang.reflect.Field;
-import static org.xiaoxian.EasyLAN.devMode;
 
 public class TextBoxUtil extends GuiTextField {
 
@@ -33,11 +36,20 @@ public class TextBoxUtil extends GuiTextField {
         try {
             if (this.getVisible()) {
                 // 绘制背景
-                drawRect(xPosition, yPosition, xPosition + width + 4, yPosition + height, new Color(128, 128, 128, 30).getRGB());
+                drawRect(
+                    xPosition,
+                    yPosition,
+                    xPosition + width + 4,
+                    yPosition + height,
+                    new Color(128, 128, 128, 30).getRGB());
 
                 // 绘制边框
                 GL11.glLineWidth(2f);
-                drawHorizontalLine(xPosition, xPosition + width + 3, yPosition + height - 1, new Color(135,206,250).getRGB());
+                drawHorizontalLine(
+                    xPosition,
+                    xPosition + width + 3,
+                    yPosition + height - 1,
+                    new Color(135, 206, 250).getRGB());
                 GL11.glLineWidth(1f);
 
                 int textColor = this.getEnableBackgroundDrawing() ? 14737632 : 7368816;
@@ -76,7 +88,8 @@ public class TextBoxUtil extends GuiTextField {
                 if (renderer != null) {
                     drawString(renderer, textToDraw, xPosition + 4, yPosition + (height - 8) / 2, textColor);
                 } else {
-                    System.err.println("[EasyLan] Critical: No FontRenderer available - falling back to basic rendering");
+                    System.err
+                        .println("[EasyLan] Critical: No FontRenderer available - falling back to basic rendering");
                     // 最后的降级方案：什么都不画
                 }
             }
@@ -113,7 +126,7 @@ public class TextBoxUtil extends GuiTextField {
                         field.setAccessible(true);
                         Object value = field.get(this);
                         if (value instanceof FontRenderer) {
-                            //System.out.println("[EasyLan] Found FontRenderer in field: " + field.getName());
+                            // System.out.println("[EasyLan] Found FontRenderer in field: " + field.getName());
                             return (FontRenderer) value;
                         }
                     } catch (Exception ex) {

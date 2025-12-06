@@ -1,13 +1,15 @@
 package org.xiaoxian.util;
 
+import java.awt.*;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
-import org.lwjgl.opengl.GL11;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import org.lwjgl.opengl.GL11;
 
 public class ButtonUtil extends GuiButton {
 
@@ -20,7 +22,9 @@ public class ButtonUtil extends GuiButton {
     @Override
     public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
         if (this.visible) {
-            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition
+                && mouseX < this.xPosition + this.width
+                && mouseY < this.yPosition + this.height;
             int i = this.getHoverState(this.field_146123_n);
 
             FontRenderer fontrenderer = mc.fontRenderer;
@@ -46,7 +50,12 @@ public class ButtonUtil extends GuiButton {
             } else if (this.field_146123_n) {
                 j = 16777120;
             }
-            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, j);
+            this.drawCenteredString(
+                fontrenderer,
+                this.displayString,
+                this.xPosition + this.width / 2,
+                this.yPosition + (this.height - 8) / 2,
+                j);
         }
     }
 }

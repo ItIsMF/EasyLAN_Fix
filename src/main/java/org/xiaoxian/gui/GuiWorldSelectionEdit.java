@@ -1,6 +1,5 @@
 package org.xiaoxian.gui;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -9,7 +8,10 @@ import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 public class GuiWorldSelectionEdit {
+
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
         if (event.gui instanceof GuiSelectWorld) {

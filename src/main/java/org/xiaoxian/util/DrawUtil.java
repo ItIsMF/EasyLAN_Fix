@@ -1,11 +1,13 @@
 package org.xiaoxian.util;
 
-import net.minecraft.client.renderer.Tessellator;
-import org.lwjgl.opengl.GL11;
-
 import java.awt.*;
 
+import net.minecraft.client.renderer.Tessellator;
+
+import org.lwjgl.opengl.GL11;
+
 public class DrawUtil {
+
     public static void drawRect(int x, int y, int width, int height, Color color) {
         Tessellator tessellator = Tessellator.instance;
         float red = color.getRed() / 255.0F;

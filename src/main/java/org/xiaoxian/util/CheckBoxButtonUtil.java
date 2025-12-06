@@ -2,9 +2,11 @@ package org.xiaoxian.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+
 import org.lwjgl.opengl.GL11;
 
 public class CheckBoxButtonUtil extends GuiButton {
+
     private boolean checked;
     private boolean hovered;
 
@@ -29,9 +31,9 @@ public class CheckBoxButtonUtil extends GuiButton {
     public void drawButton(Minecraft mc, int mouseX, int mouseY) {
         if (this.visible) {
             // 检查鼠标悬停状态
-            this.field_146123_n = (mouseX >= this.xPosition && mouseY >= this.yPosition &&
-                mouseX < this.xPosition + this.width &&
-                mouseY < this.yPosition + this.height);
+            this.field_146123_n = (mouseX >= this.xPosition && mouseY >= this.yPosition
+                && mouseX < this.xPosition + this.width
+                && mouseY < this.yPosition + this.height);
             this.hovered = this.field_146123_n;
 
             // 保存 OpenGL 状态
@@ -46,36 +48,50 @@ public class CheckBoxButtonUtil extends GuiButton {
 
                 // 绘制边框
                 int borderColor = this.hovered ? 0xFFA0A0A0 : 0xFF808080;
-                drawRect(this.xPosition, this.yPosition,
-                    this.xPosition + this.width, this.yPosition + 1,
+                drawRect(this.xPosition, this.yPosition, this.xPosition + this.width, this.yPosition + 1, borderColor);
+                drawRect(this.xPosition, this.yPosition, this.xPosition + 1, this.yPosition + this.height, borderColor);
+                drawRect(
+                    this.xPosition + this.width - 1,
+                    this.yPosition,
+                    this.xPosition + this.width,
+                    this.yPosition + this.height,
                     borderColor);
-                drawRect(this.xPosition, this.yPosition,
-                    this.xPosition + 1, this.yPosition + this.height,
-                    borderColor);
-                drawRect(this.xPosition + this.width - 1, this.yPosition,
-                    this.xPosition + this.width, this.yPosition + this.height,
-                    borderColor);
-                drawRect(this.xPosition, this.yPosition + this.height - 1,
-                    this.xPosition + this.width, this.yPosition + this.height,
+                drawRect(
+                    this.xPosition,
+                    this.yPosition + this.height - 1,
+                    this.xPosition + this.width,
+                    this.yPosition + this.height,
                     borderColor);
 
                 // 绘制内部背景
                 int backgroundColor = this.hovered ? 0xFFE0E0E0 : 0xFFFFFFFF;
-                drawRect(this.xPosition + 1, this.yPosition + 1,
-                    this.xPosition + this.width - 1, this.yPosition + this.height - 1,
+                drawRect(
+                    this.xPosition + 1,
+                    this.yPosition + 1,
+                    this.xPosition + this.width - 1,
+                    this.yPosition + this.height - 1,
                     backgroundColor);
 
                 // 如果选中，绘制勾选标记
                 if (this.checked) {
                     // 绘制绿色勾号
-                    drawRect(this.xPosition + 4, this.yPosition + this.height / 2 - 1,
-                        this.xPosition + this.width / 2 - 1, this.yPosition + this.height / 2 + 1,
+                    drawRect(
+                        this.xPosition + 4,
+                        this.yPosition + this.height / 2 - 1,
+                        this.xPosition + this.width / 2 - 1,
+                        this.yPosition + this.height / 2 + 1,
                         0xFF008000); // 水平线
-                    drawRect(this.xPosition + this.width / 2 - 1, this.yPosition + this.height / 2 - 1,
-                        this.xPosition + this.width - 4, this.yPosition + this.height / 2 + 1,
+                    drawRect(
+                        this.xPosition + this.width / 2 - 1,
+                        this.yPosition + this.height / 2 - 1,
+                        this.xPosition + this.width - 4,
+                        this.yPosition + this.height / 2 + 1,
                         0xFF008000); // 斜线
-                    drawRect(this.xPosition + 4, this.yPosition + this.height / 2 - 1,
-                        this.xPosition + this.width / 2 - 1, this.yPosition + this.height - 4,
+                    drawRect(
+                        this.xPosition + 4,
+                        this.yPosition + this.height / 2 - 1,
+                        this.xPosition + this.width / 2 - 1,
+                        this.yPosition + this.height - 4,
                         0xFF008000); // 垂直线
                 }
 
@@ -93,8 +109,9 @@ public class CheckBoxButtonUtil extends GuiButton {
     @Override
     public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
         if (this.enabled && this.visible) {
-            if (mouseX >= this.xPosition && mouseY >= this.yPosition &&
-                mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height) {
+            if (mouseX >= this.xPosition && mouseY >= this.yPosition
+                && mouseX < this.xPosition + this.width
+                && mouseY < this.yPosition + this.height) {
 
                 this.toggle();
                 return true;

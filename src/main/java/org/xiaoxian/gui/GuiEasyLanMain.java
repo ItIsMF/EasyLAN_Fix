@@ -1,20 +1,24 @@
 package org.xiaoxian.gui;
 
+import static org.xiaoxian.EasyLAN.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
+
 import org.xiaoxian.util.ButtonUtil;
 import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
-import java.util.ArrayList;
-import java.util.List;
-import static org.xiaoxian.EasyLAN.*;
 
 public class GuiEasyLanMain extends GuiScreen {
+
     private GuiTextField MotdTextBox;
-    private String MotdText = motd != null ? motd : "";  // 添加 null 检查
+    private String MotdText = motd != null ? motd : ""; // 添加 null 检查
     private final GuiScreen parentScreen;
     private final List<GuiButton> buttonList = new ArrayList<>();
 
@@ -26,8 +30,10 @@ public class GuiEasyLanMain extends GuiScreen {
     public void initGui() {
         buttonList.clear();
 
-        buttonList.add(new ButtonUtil(0, this.width / 2 + 70 - 60, this.height - 25, 100, 20, I18n.format("easylan.back")));
-        buttonList.add(new ButtonUtil(1, this.width / 2 - 50 - 60, this.height - 25, 100, 20, I18n.format("easylan.save")));
+        buttonList
+            .add(new ButtonUtil(0, this.width / 2 + 70 - 60, this.height - 25, 100, 20, I18n.format("easylan.back")));
+        buttonList
+            .add(new ButtonUtil(1, this.width / 2 - 50 - 60, this.height - 25, 100, 20, I18n.format("easylan.save")));
 
         int baseX = this.width / 2 - 145 + 45;
         int baseY = 60 - 5;
@@ -69,7 +75,12 @@ public class GuiEasyLanMain extends GuiScreen {
             drawString(mc.fontRenderer, safeGetString("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
             drawString(mc.fontRenderer, safeGetString("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
             drawString(mc.fontRenderer, safeGetString("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-            drawString(mc.fontRenderer, safeGetString("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
+            drawString(
+                mc.fontRenderer,
+                safeGetString("easylan.text.spawnAnimals"),
+                this.width / 2 - 165,
+                110,
+                0xFFFFFF);
             drawString(mc.fontRenderer, safeGetString("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
             drawString(mc.fontRenderer, safeGetString("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
 
@@ -162,17 +173,39 @@ public class GuiEasyLanMain extends GuiScreen {
 
                 boolean newState = checkBox.isChecked();
                 switch (button.id) {
-                    case 10: allowPVP = newState; break;
-                    case 11: onlineMode = newState; break;
-                    case 12: spawnAnimals = newState; break;
-                    case 13: spawnNPCs = newState; break;
-                    case 14: allowFlight = newState; break;
-                    case 20: whiteList = newState; break;
-                    case 21: BanCommand = newState; break;
-                    case 22: OpCommand = newState; break;
-                    case 23: SaveCommand = newState; break;
-                    case 30: HttpAPI = newState; break;
-                    case 31: LanOutput = newState; break;
+                    case 10:
+                        allowPVP = newState;
+                        break;
+                    case 11:
+                        onlineMode = newState;
+                        break;
+                    case 12:
+                        spawnAnimals = newState;
+                        break;
+                    case 13:
+                        spawnNPCs = newState;
+                        break;
+                    case 14:
+                        allowFlight = newState;
+                        break;
+                    case 20:
+                        whiteList = newState;
+                        break;
+                    case 21:
+                        BanCommand = newState;
+                        break;
+                    case 22:
+                        OpCommand = newState;
+                        break;
+                    case 23:
+                        SaveCommand = newState;
+                        break;
+                    case 30:
+                        HttpAPI = newState;
+                        break;
+                    case 31:
+                        LanOutput = newState;
+                        break;
                 }
 
                 // 立即保存配置
@@ -182,7 +215,6 @@ public class GuiEasyLanMain extends GuiScreen {
             System.err.println("[EasyLAN] Error in actionPerformed: " + e.getMessage());
         }
     }
-
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
@@ -250,17 +282,39 @@ public class GuiEasyLanMain extends GuiScreen {
                 if (button instanceof CheckBoxButtonUtil) {
                     CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
                     switch (button.id) {
-                        case 10: checkBox.setChecked(allowPVP); break;
-                        case 11: checkBox.setChecked(onlineMode); break;
-                        case 12: checkBox.setChecked(spawnAnimals); break;
-                        case 13: checkBox.setChecked(spawnNPCs); break;
-                        case 14: checkBox.setChecked(allowFlight); break;
-                        case 20: checkBox.setChecked(whiteList); break;
-                        case 21: checkBox.setChecked(BanCommand); break;
-                        case 22: checkBox.setChecked(OpCommand); break;
-                        case 23: checkBox.setChecked(SaveCommand); break;
-                        case 30: checkBox.setChecked(HttpAPI); break;
-                        case 31: checkBox.setChecked(LanOutput); break;
+                        case 10:
+                            checkBox.setChecked(allowPVP);
+                            break;
+                        case 11:
+                            checkBox.setChecked(onlineMode);
+                            break;
+                        case 12:
+                            checkBox.setChecked(spawnAnimals);
+                            break;
+                        case 13:
+                            checkBox.setChecked(spawnNPCs);
+                            break;
+                        case 14:
+                            checkBox.setChecked(allowFlight);
+                            break;
+                        case 20:
+                            checkBox.setChecked(whiteList);
+                            break;
+                        case 21:
+                            checkBox.setChecked(BanCommand);
+                            break;
+                        case 22:
+                            checkBox.setChecked(OpCommand);
+                            break;
+                        case 23:
+                            checkBox.setChecked(SaveCommand);
+                            break;
+                        case 30:
+                            checkBox.setChecked(HttpAPI);
+                            break;
+                        case 31:
+                            checkBox.setChecked(LanOutput);
+                            break;
                     }
                 }
             }

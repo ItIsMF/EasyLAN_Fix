@@ -1,19 +1,6 @@
 package org.xiaoxian.lan;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetworkSystem;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import org.xiaoxian.gui.GuiShareToLanEdit;
-import org.xiaoxian.util.ChatUtil;
-import org.xiaoxian.util.NetworkUtil;
+import static org.xiaoxian.EasyLAN.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -29,9 +16,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.xiaoxian.EasyLAN.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetworkSystem;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraftforge.client.event.GuiScreenEvent;
+
+import org.xiaoxian.gui.GuiShareToLanEdit;
+import org.xiaoxian.util.ChatUtil;
+import org.xiaoxian.util.NetworkUtil;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class ShareToLan {
+
     public static List<EntityPlayerMP> playerList;
     public static ExecutorService executorService;
     public static ScheduledExecutorService updateService;
@@ -62,15 +64,18 @@ public class ShareToLan {
         String fieldName = devMode ? "maxPlayers" : "field_72405_c";
         Minecraft mc = Minecraft.getMinecraft();
         IntegratedServer server = mc.getIntegratedServer();
-        NetworkSystem networkSystem = MinecraftServer.getServer().func_147137_ag();
+        NetworkSystem networkSystem = MinecraftServer.getServer()
+            .func_147137_ag();
 
         /* 判断是否自定义端口号 */
-        if (!(GuiShareToLanEdit.PortTextBox.getText().isEmpty())) {
+        if (!(GuiShareToLanEdit.PortTextBox.getText()
+            .isEmpty())) {
             startLanPort(networkSystem, Integer.parseInt(GuiShareToLanEdit.PortTextBox.getText()));
         }
 
         /* 判断是否自定义最大玩家数 */
-        if (!(GuiShareToLanEdit.MaxPlayerBox.getText().isEmpty())) {
+        if (!(GuiShareToLanEdit.MaxPlayerBox.getText()
+            .isEmpty())) {
             setMaxPlayer(fieldName);
         }
 
@@ -106,8 +111,10 @@ public class ShareToLan {
             ChatUtil.sendMsg(" ");
             ChatUtil.sendMsg("&e" + I18n.format("easylan.text.port") + ": &a" + lanPort);
 
-            if (!(GuiShareToLanEdit.PortTextBox.getText().isEmpty())) {
-                ChatUtil.sendMsg("&e" + I18n.format("easylan.text.CtPort") + ": &a" + GuiShareToLanEdit.PortTextBox.getText());
+            if (!(GuiShareToLanEdit.PortTextBox.getText()
+                .isEmpty())) {
+                ChatUtil.sendMsg(
+                    "&e" + I18n.format("easylan.text.CtPort") + ": &a" + GuiShareToLanEdit.PortTextBox.getText());
             }
 
             ChatUtil.sendMsg(" ");
@@ -141,7 +148,8 @@ public class ShareToLan {
     /* 定时异步处理API */
     private void updateApiInfo(IntegratedServer server) {
         updateService.scheduleAtFixedRate(() -> {
-            if (GuiShareToLanEdit.PortTextBox.getText().isEmpty()) {
+            if (GuiShareToLanEdit.PortTextBox.getText()
+                .isEmpty()) {
                 HttpApi.set("port", String.valueOf(getLanPort()));
             } else {
                 HttpApi.set("port", GuiShareToLanEdit.PortTextBox.getText());
@@ -155,12 +163,18 @@ public class ShareToLan {
             HttpApi.set("spawnAnimals", String.valueOf(spawnAnimals));
             HttpApi.set("spawnNPCs", String.valueOf(spawnNPCs));
             HttpApi.set("allowFlight", String.valueOf(allowFlight));
-            HttpApi.set("difficulty", String.valueOf(server.func_147135_j().getDifficultyResourceKey()));
+            HttpApi.set(
+                "difficulty",
+                String.valueOf(
+                    server.func_147135_j()
+                        .getDifficultyResourceKey()));
             HttpApi.set("gameType", String.valueOf(server.getGameType()));
             HttpApi.set("maxPlayer", String.valueOf(server.getMaxPlayers()));
             HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
 
-            playerList = (List<EntityPlayerMP>) FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().playerEntityList;
+            playerList = (List<EntityPlayerMP>) FMLCommonHandler.instance()
+                .getMinecraftServerInstance()
+                .getConfigurationManager().playerEntityList;
             List<String> playerIDs = new ArrayList<>();
             for (EntityPlayerMP player : playerList) {
                 playerIDs.add(player.getDisplayName());
@@ -170,10 +184,10 @@ public class ShareToLan {
         }, 100, 500, TimeUnit.MILLISECONDS);
     }
 
-
     private void setMaxPlayer(String fieldName) {
         try {
-            IntegratedServer server = (IntegratedServer) FMLCommonHandler.instance().getMinecraftServerInstance();
+            IntegratedServer server = (IntegratedServer) FMLCommonHandler.instance()
+                .getMinecraftServerInstance();
             if (server == null) {
                 System.err.println("[EasyLAN] Server instance is null");
                 return;
@@ -285,7 +299,9 @@ public class ShareToLan {
                             // 启发式判断：合理的玩家数范围
                             if (currentValue > 0 && currentValue <= 1000) {
                                 field.setInt(playerList, maxPlayers);
-                                System.out.println("[EasyLAN] Force set " + field.getName() + " from " + currentValue + " to " + maxPlayers);
+                                System.out.println(
+                                    "[EasyLAN] Force set " + field
+                                        .getName() + " from " + currentValue + " to " + maxPlayers);
                                 return;
                             }
                         }
@@ -309,7 +325,11 @@ public class ShareToLan {
         try {
             networkSystem.addLanEndpoint(InetAddress.getByName("0.0.0.0"), port);
             if (!LanOutput) {
-                ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.format("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortTextBox.getText() + "&f]");
+                ChatUtil.sendMsg(
+                    "&e[&6EasyLan&e] &a" + I18n.format("easylan.chat.CtPort")
+                        + " &f[&e"
+                        + GuiShareToLanEdit.PortTextBox.getText()
+                        + "&f]");
             }
         } catch (IOException e) {
             ChatUtil.sendMsg("&e[&6EasyLan&e] &c" + I18n.format("easylan.chat.CtPortError"));
