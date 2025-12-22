@@ -4,12 +4,18 @@ plugins {
 }
 
 group = "com.xiaoxian.easylan"
-version = "1.5fix"
+version = "1.6"
 val archivesBaseName = "EasyLAN_Fix"
 
 tasks.jar {
-    archiveBaseName.set("EasyLAN_Fix")           // 基础名称
-    archiveVersion.set("1.5fix")            // 版本号
-    archiveClassifier.set("")       // 分类器（可选）
-    archiveExtension.set("jar")            // 扩展名（默认）
+    manifest {
+        attributes(
+            "Manifest-Version" to "1.0"
+        )
+    }
+
+    archiveBaseName.set(archivesBaseName)
+    archiveVersion.set(version.toString())
+    archiveClassifier.set("")
+    archiveExtension.set("jar")
 }

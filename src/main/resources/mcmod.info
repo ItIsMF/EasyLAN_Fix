@@ -4,7 +4,7 @@
 		"modid": "${modId}",
 		"name": "${modName}",
 		"description": "Custom LAN Servers",
-		"version": "1.5_fix",
+		"version": "1.6",
 		"mcversion": "${minecraftVersion}",
 		"url": "https://github.com/XiaoXianHW/EasyLAN",
 		"updateUrl": "",

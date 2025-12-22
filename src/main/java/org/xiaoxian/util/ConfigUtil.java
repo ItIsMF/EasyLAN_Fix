@@ -79,6 +79,7 @@ public class ConfigUtil {
         set("BanCommand", String.valueOf(BanCommand));
         set("OpCommand", String.valueOf(OpCommand));
         set("SaveCommand", String.valueOf(SaveCommand));
+        set("showGUI", String.valueOf(showGUI));
         set("Motd", motd);
         set("Port", CustomPort);
         set("MaxPlayer", CustomMaxPlayer);
@@ -97,6 +98,7 @@ public class ConfigUtil {
         SaveCommand = Boolean.parseBoolean(get("SaveCommand"));
         HttpAPI = Boolean.parseBoolean(get("Http-Api"));
         LanOutput = Boolean.parseBoolean(get("Lan-output"));
+        showGUI = Boolean.parseBoolean(get("showGUI"));
         CustomPort = get("Port");
         CustomMaxPlayer = get("MaxPlayer");
         motd = get("Motd");
@@ -119,6 +121,7 @@ public class ConfigUtil {
         BanCommand = false;
         OpCommand = false;
         SaveCommand = false;
+        showGUI = true;
         motd = "This is a Default EasyLAN Motd!";
         CustomPort = "25565";
         CustomMaxPlayer = "20";
@@ -135,6 +138,7 @@ public class ConfigUtil {
         set("BanCommand", "false");
         set("OpCommand", "false");
         set("SaveCommand", "false");
+        set("showGUI", "true");
         set("Motd", "This is a Default EasyLAN Motd!");
         set("Port", "25565");
         set("MaxPlayer", "20");
